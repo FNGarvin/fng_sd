@@ -46,13 +46,10 @@ fi
 echo "Beginning image build..."
 podman build -t fng_sd $AIBUILDVARG .
 
-#test
-#echo podman run -d --name forge $AIBUILDVARG -p 7861:7861 --device nvidia.com/gpu=all --security-opt=label=disable fng_sd sleep infinity
-
 #launch forge UI in a container named forge:
 echo "Running forge container from fng_sd image"
 echo podman run -d --name forge $AIBUILDVARG -p 7861:7861 --device nvidia.com/gpu=all --security-opt=label=disable fng_sd /home/ai/stable-diffusion-webui-forge/webui.sh
 
-#launch Automatic1111 in a container named a1111:
-#echo "Running a1111 container from fng_sd image"
-#echo podman run -d --name a1111 $AIBUILDVARG -p 7860:7860 --device nvidia.com/gpu=all --security-opt=label=disable fng_sd /home/ai/stable-diffusion-webui/webui.sh
+#launch A1111 in a container named a1111:
+echo "Running a1111 container from fng_sd image"
+echo podman run -d --name a1111 $AIBUILDVARG -p 7860:7860 --device nvidia.com/gpu=all --security-opt=label=disable fng_sd /home/ai/stable-diffusion-webui/webui.sh

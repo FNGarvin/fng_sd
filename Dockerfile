@@ -12,9 +12,9 @@ EXPOSE 7861
 #install some packages
 RUN apt update && apt install -y wget git python3 python3-venv libgl1 libglib2.0-0 libtcmalloc-minimal4 python3-pip sudo python-is-python3 dos2unix bc
 RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
-RUN pip install GitPython accelerate aiohttp av basicsr blendmodes clean-fid cloudpickle config decorator diffusers diskcache einops facexlib fastapi fvcore gradio gradio_imageslider gradio_rangeslider httpcore httpx inflection jsonmerge kornia lark loadimg mediapipe numpy omegaconf onnxruntime open-clip-torch opencv-python peft piexif pillow-avif-plugin protobuf psutil pycocotools pydantic pytest-aiohttp pytest-asyncio pytest-cov pytest pytorch_lightning pyyaml requests resize-right safetensors scikit-image scipy sentencepiece setuptools spandrel spandrel-extra-arches svglib synr tokenizers tomesd torchdiffeq torchsde tornado tqdm transformers
-RUN pip install insightface handrefinerportable depth_anything depth_anything_v2
-#todo ? hugungface-hub soundfile 
+#it's looking like it's, unfortunately, going to be more prudent to let each UI pick their own packages.
+#too many moving parts with specific dependencies to justify the effort required just to save some few GB of download
+#even just forcing pytorch w/ cuda 12.4 is a challenge...
 
 #setup a user account ala https://forums.developer.nvidia.com/t/using-nvidia-docker-containers-as-non-root-user/235252 for vgluser trick on rootless NVidia
 RUN groupadd -g 1005 vglusers && \
@@ -41,7 +41,7 @@ RUN find -type f -exec ln --symbolic -- /run/media/ai/models/{} /home/ai/stable-
 RUN find -type d -exec mkdir --parents -- /home/ai/stable-diffusion-webui-forge/models/{} \;
 RUN find -type f -exec ln --symbolic -- /run/media/ai/models/{} /home/ai/stable-diffusion-webui-forge/models/{} \;
 
-#patch a111 for torch w/ cuda12.4 support (no longer needed as we are preinstalling torch)
+#patch a111 for torch w/ cuda12.4 support (no longer needed as we are preinstalling torch outside of venv)
 RUN sed -i 's/#export TORCH_COMMAND.*$/export TORCH_COMMAND=\"pip install torch torchvision --index-url https:\/\/download.pytorch.org\/whl\/cu124\"/g' /home/ai/stable-diffusion-webui/webui-user.sh
 #patch forge and a11111's to use system python instead of venv (no need for containerception)
 RUN sed -i 's/^#venv_dir=\"venv\"$/venv_dir=-/g' /home/ai/stable-diffusion-webui/webui-user.sh
